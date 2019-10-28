@@ -1,5 +1,5 @@
- {% import "bootstrap/wtf.html" as wtf %}
- <!DOCTYPE html>
+{% import "bootstrap/wtf.html" as wtf %}
+<!DOCTYPE html>
 <html>
 <head>
 	<title>Task App</title>
@@ -11,19 +11,18 @@
 </head>
 <body class="container p-4">
 	<h1 class="display-4 text-center title mt-4">Task App</h1>
-	<h2>Login</h2>
+	<h2>Sign up</h2>
 	<div class="row">
 		<div class="col-md-4 offset-md-4 my-auto">
 			<div class="card">
 				<div class="card-header">
-					<form action="/" method="POST">
-					{{form.hidden_tag()}}
-					{{wtf.form_field(form.user_name)}}
-					{{wtf.form_field(form.password)}}
-					{{wtf.form_field(form.remember)}}					
-						<button type="submit" class="btn btn-primary btn-block">Login</button>
+					<form action="/SignUp" method="POST">
+						{{form.hidden_tag()}}
+						{{wtf.form_field(form.user_name)}}
+						{{wtf.form_field(form.password)}}
+						{{wtf.form_field(form.email)}}												
+						<button type="submit" class="btn btn-primary btn-block">Sign Up</button>
 					</form>
-					<a href="/SignUp">Sign Up</a>
 				</div>						
 			</div>
 		</div>
