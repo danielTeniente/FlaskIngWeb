@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Task App</title>
+	<title>Pendientes</title>
 	<!--Bootstrap-->
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 	<!--Fonts-->
@@ -9,27 +9,24 @@
 	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='main.css')}}">
 </head>
 <body class="container p-4">
-	<h1 class="display-4 text-center title mt-4">Task App</h1>
+	<h1 class="display-4 text-center title mt-4">Pasos por cumplir</h1>
 	<div class="row">
 		<div class="col-md-4 offset-md-4 my-auto">
 			<div class="card">
-				<div class="card-header">
-					<form action="/create-task" method="POST">
-						<div class="form-group">
-							<input type="text" placeholder="Task" name="content" class="form-control" autofocus>							
-						</div>
-
-						<button type="submit" class="btn btn-primary btn-block">Save</button>
-					</form>
-				</div>
 				<div class="card-body">
 					<ul class="list-group">
 						{% for task in list %}
 							<li class="list-group-item">
-								<span class="{% if task.done %} done {% endif %}">{{task.content}}</span>
+								<span class="{% if task.estado %} done {% endif %}">Nombre: {{task.nombre}}</span>
+								<br>
+								<span class="{% if task.estado %} done {% endif %}">Descripción: {{task.descripcion}}</span>
+								<br>
+								<span class="{% if task.estado %} done {% endif %}">Fecha de inicio: {{task.fecha_inicio}}</span>
+								<br>
+								<span class="{% if task.estado %} done {% endif %}">Fecha máxima de entrega: {{task.fecha_plazo_final}}</span>
+								<br>
 								<a href="/done/{{task.id}}" class="btn btn-success btn-sm">Done</a>
-								<a href="/edit/{{task.id}}" class="btn btn-success btn-sm">Edit</a>
-								<a href="/delete/{{task.id}}" class="btn btn-danger btn-sm">Delete</a>
+	
 							</li>
 						{% endfor %}
 					</ul>
