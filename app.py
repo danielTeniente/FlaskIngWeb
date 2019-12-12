@@ -11,12 +11,15 @@ from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.helpers import is_form_submitted
 from flask_admin.model.base import BaseModelView
+from datetime import date, datetime, timedelta
 
 
 app = Flask(__name__)
 Bootstrap(app)
 app.config['SECRET_KEY']='EstoEsUnSecreto'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/tasks.db'
+
+
 
 login_manager=LoginManager()
 login_manager.init_app(app)
@@ -25,6 +28,8 @@ login_manager.login_view = 'index'
 db = SQLAlchemy(app)
 
 admin = Admin(app)
+
+
 
 class MyModelView(ModelView):
 	def is_accessible(self):
@@ -114,14 +119,9 @@ admin.add_view(MyModelView(User,db.session))
 def load_user(user_id):
 	return User.query.get(int(user_id))
 
-
-
 admin.add_view(MyModelView(Task,db.session))
 admin.add_view(MyModelView(Proceso,db.session))
 admin.add_view(MyModelView(Categoria,db.session))
-
-		
-
 
 @app.route("/",methods=['GET','POST'])
 def index():
@@ -149,54 +149,121 @@ def sign_up():
 @app.route("/task")
 @login_required
 def task():
-	tasks=Proceso.query.filter_by(user_id=current_user.id) #corregir tasks por procesos
-	return render_template('task.html', list=tasks)
+	tasks=Proceso.query.filter_by(user_id=current_user.id) 
+	return render_template('procesos.html', list=tasks)
 
-
-""" @app.route("/create-task",methods=['POST'])
+@app.route("/task/pasos/<id>",methods=['GET','POST'])
 @login_required
-def create():
-    task=Task(content=request.form['content'], done=False)
-    db.session.add(task)
-    db.session.commit()
-    return redirect(url_for('task')) """
-
-""" @app.route("/save-task/<id>",methods=['POST'])
-@login_required
-def save(id):
-	task=Task.query.filter_by(id=int(id)).first()
-	task.content=request.form['content']
-	db.session.commit()
-	return redirect(url_for('task')) """
+def pasos(id):
+	tasks=Task.query.filter_by(id_proceso=int(id)) 
+	return render_template('pasos.html', list=tasks)
 
 @app.route('/done/<id>')
 @login_required
 def done(id):
 	task=Task.query.filter_by(id=int(id)).first()
 	task.estado=not(task.estado)
+	if(task.estado):
+		task.fecha_fin=date.today()
+	else:
+		task.fecha_fin=None
 	db.session.commit()
-	return redirect(url_for('task'))
+	return redirect(url_for('pasos',id=task.id_proceso))
 
 
-""" @app.route("/edit/<id>")
-@login_required
-def edit(id):
-	task=Task.query.filter_by(id=int(id)).first()
-	return render_template('edit.html', task=task)
-
-@app.route("/delete/<id>")
-@login_required
-def delete(id):
-	#task=Task.query.filter_by(id=int(id)).first()
-	task=Task.query.filter_by(id=int(id)).delete()
-	db.session.commit()
-	return redirect(url_for('task'))
- """
 @app.route("/logout")
 @login_required
 def logout():
 	logout_user()
 	return redirect(url_for('index'))
+
+@app.route("/Consultas",methods=['GET','POST'])
+@login_required
+def consultas():
+	return render_template('consultar.html')
+
+@app.route("/mostrar-top5",methods=['POST'])
+@login_required
+def top5():
+	fecha_inicio = request.form['fecha_inicio']
+	fecha_inicio = datetime.strptime(fecha_inicio, "%Y-%m-%d")
+	fecha_fin = request.form['fecha_fin']
+	fecha_fin = datetime.strptime(fecha_fin, "%Y-%m-%d")
+	usuarios = User.query.all()
+	procesos = Proceso.query.all()
+	pasos = Task.query.all()
+	#top 5 actual
+	top5List=[]
+	miembros=0
+	maximo=0
+	for usuario in usuarios:
+		cont_total=0
+		for proceso in procesos:
+			if(proceso.user_id==usuario.id):
+				for paso in pasos:
+					if(paso.id_proceso==proceso.id):
+						if(paso.estado and (paso.fecha_fin>=fecha_inicio.date()) and (paso.fecha_fin<=fecha_fin.date())):
+							cont_total+=1
+		if(cont_total>maximo):
+			top5List.append([usuario,cont_total])
+			miembros+=1
+		if(miembros>5):
+			top5List.pop(0)
+
+	#top 5 anterior
+	maximo=0
+	miembros=0
+	diferenciaDias=fecha_fin-fecha_inicio
+	periodoAnteriorInicio = fecha_inicio - diferenciaDias - timedelta(days=1)
+	periodoAnteriorFinal = fecha_inicio - timedelta(days=1)
+	top5AnteriorList=[]
+	for usuario in usuarios:
+		cont_total=0
+		for proceso in procesos:
+			if(proceso.user_id==usuario.id):
+				for paso in pasos:
+					if(paso.id_proceso==proceso.id):
+						if(paso.estado and (paso.fecha_fin>=periodoAnteriorInicio.date()) and (paso.fecha_fin<=periodoAnteriorFinal.date())):
+							cont_total+=1
+		if(cont_total>maximo):
+			top5AnteriorList.append([usuario,cont_total])
+			miembros+=1
+		if(miembros>5):
+			top5AnteriorList.pop(0)
+
+	#top 5 anterior
+	maximo=0
+	for usuario in top5List:
+		cont_total=0
+		for proceso in procesos:
+			if(proceso.user_id==usuario[0].id):
+				for paso in pasos:
+					if(paso.id_proceso==proceso.id):
+						if(paso.estado and (paso.fecha_fin>=periodoAnteriorInicio.date()) and (paso.fecha_fin<=periodoAnteriorFinal.date())):
+							cont_total+=1
+		if(cont_total>maximo):
+			usuario.append(cont_total)
+	
+	print(top5List)
+	print(top5AnteriorList)
+	return "Revisa el cmd"
+
+""" 	for usuario in usuarios:
+		cont_total=0
+		for proceso in procesos:
+			if(proceso.user_id==usuario.id):
+				for paso in pasos:
+					if(paso.id_proceso==proceso.id):
+						if(paso.estado and (paso.fecha_fin>=fecha_inicio.date()) and (paso.fecha_fin<=fecha_fin.date())):
+							cont_total+=1
+		if(cont_total>maximo):
+			top5List.append([usuario,cont_total])
+			miembros+=1
+		if(miembros>5):
+			top5List.pop(0) """
+			
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

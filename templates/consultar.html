@@ -14,12 +14,12 @@
 		<div class="col-md-4 offset-md-4 my-auto">
 			<div class="card">
 				<div class="card-header">
-					<form action="/save-task/{{task.id}}" method="POST">
+					<form action="/mostrar-top5" method="POST">
 						<div class="form-group">
-							<input type="text" value="{{task.content}}" name="content" class="form-control" autofocus>			
+							<input type="date" value="" name="fecha_inicio" class="form-control">			
+							<input type="date" value="" name="fecha_fin" class="form-control">			
 						</div>
-
-						<button type="submit" class="btn btn-primary btn-block">Save</button>
+						<button type="submit" class="btn btn-primary btn-block">Ver Top 5</button>
 					</form>
 				</div>
 			</div>
