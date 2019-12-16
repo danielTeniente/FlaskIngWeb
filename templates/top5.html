@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>TOP 5</title>
+	<!--Bootstrap-->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<!--Fonts-->
+	<link href="https://fonts.googleapis.com/css?family=Lobster&display=swap" rel="stylesheet"> 
+	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='main.css')}}">
+</head>
+<body class="container p-4">
+	<h1 class="display-4 text-center title mt-4">TOP 5</h1>
+	<div class="row">
+		<div class="col">
+			<div class="card">
+				<div class="card-body">
+					<h2>Período anterior</h2>
+					<span>{{list[2][2]}} - {{list[2][3]}}</span>
+
+					<ul class="list-group">
+						{% for i in range(5) %}
+						
+							<li class="list-group-item">
+								<h3>{{i+1}}</h3>
+								<span>Nombre: {{list[1][i][0].user_name}}</span>
+								<br>
+								<span>Cedula: {{list[1][i][0].cedula}}</span>
+								<br>
+								<span>Especialidad: {{list[1][i][0].especialidad}}</span>
+								<br>
+								<span>Tareas completadas: {{list[1][i][1]}}</span>
+								<br>
+								
+							</li>
+							
+						{% endfor %}
+					</ul>
+				</div>							
+			</div>
+		</div>
+		<div class="col">
+			<div class="card">
+				<div class="card-body">
+						<h2>Período actual</h2>
+						<span>{{list[2][0]}} - {{list[2][1]}}</span>
+					<ul class="list-group">
+						{% for i in range(5) %}
+						
+							<li class="list-group-item">
+								<h3>{{i+1}}</h3>
+								<span>Nombre: {{list[0][i][0].user_name}}</span>
+								<br>
+								<span>Cedula: {{list[0][i][0].cedula}}</span>
+								<br>
+								<span>Especialidad: {{list[0][i][0].especialidad}}</span>
+								<br>
+								<span>Tareas completadas: {{list[0][i][1]}}</span>
+								<br>
+								<span>Tareas completadas el periodo anterior: {{list[0][i][2]}}</span>
+
+							</li>
+							
+						{% endfor %}
+					</ul>
+				</div>							
+			</div>
+		</div>
+	</div>
+	<a href="/logout">Logout</a>
+</body>
+</html>

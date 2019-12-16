@@ -13,3 +13,7 @@ body{
 	text-decoration: line-through;
 	color: #cfcfcf;
 }
+
+.row{
+	flex-wrap: nowrap;
+}

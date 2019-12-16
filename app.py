@@ -85,7 +85,7 @@ class Categoria(db.Model):
 	nombre=db.Column(db.String(50),nullable=False)
 	descripcion=db.Column(db.String(200), nullable=False)
 	def __repr__(self):
-		return '<Categoria %r>' % (self.nombre)
+		return self.nombre
 
 
 class Proceso(db.Model):
@@ -180,7 +180,8 @@ def logout():
 @app.route("/Consultas",methods=['GET','POST'])
 @login_required
 def consultas():
-	return render_template('consultar.html')
+	categorias=Categoria.query.all()
+	return render_template('consultar.html',list=categorias)
 
 @app.route("/mostrar-top5",methods=['POST'])
 @login_required
@@ -189,29 +190,44 @@ def top5():
 	fecha_inicio = datetime.strptime(fecha_inicio, "%Y-%m-%d")
 	fecha_fin = request.form['fecha_fin']
 	fecha_fin = datetime.strptime(fecha_fin, "%Y-%m-%d")
+	categoria_elegida = request.form['categoria_elegida']
+	print(categoria_elegida)
+	#--------------------------------------------------------------------------------------
 	usuarios = User.query.all()
 	procesos = Proceso.query.all()
 	pasos = Task.query.all()
+	categoria_elegida = Categoria.query.filter_by(nombre=categoria_elegida).first()
+	if(categoria_elegida is None):
+		return "Error con la categoría"
+	#-------------------------------------------------------------------------------------
 	#top 5 actual
 	top5List=[]
 	miembros=0
-	maximo=0
+
 	for usuario in usuarios:
 		cont_total=0
 		for proceso in procesos:
-			if(proceso.user_id==usuario.id):
+			if((proceso.user_id==usuario.id)and(proceso.id_categoria==categoria_elegida.id) ):
 				for paso in pasos:
 					if(paso.id_proceso==proceso.id):
 						if(paso.estado and (paso.fecha_fin>=fecha_inicio.date()) and (paso.fecha_fin<=fecha_fin.date())):
 							cont_total+=1
-		if(cont_total>maximo):
+		posicion=-1
+		if(miembros!=0):
+			for i in range(len(top5List)):
+				if(cont_total>top5List[i][1]):
+					posicion=i
+					break
+		else:
 			top5List.append([usuario,cont_total])
-			miembros+=1
-		if(miembros>5):
-			top5List.pop(0)
+		top5List.insert(posicion,[usuario,cont_total])
+		miembros+=1
+		if(miembros>4):
+			top5List.pop(-1)
+		
+	
 
 	#top 5 anterior
-	maximo=0
 	miembros=0
 	diferenciaDias=fecha_fin-fecha_inicio
 	periodoAnteriorInicio = fecha_inicio - diferenciaDias - timedelta(days=1)
@@ -220,48 +236,42 @@ def top5():
 	for usuario in usuarios:
 		cont_total=0
 		for proceso in procesos:
-			if(proceso.user_id==usuario.id):
+			if((proceso.user_id==usuario.id) and (proceso.id_categoria==categoria_elegida.id)):
 				for paso in pasos:
 					if(paso.id_proceso==proceso.id):
 						if(paso.estado and (paso.fecha_fin>=periodoAnteriorInicio.date()) and (paso.fecha_fin<=periodoAnteriorFinal.date())):
 							cont_total+=1
-		if(cont_total>maximo):
-			top5AnteriorList.append([usuario,cont_total])
-			miembros+=1
-		if(miembros>5):
-			top5AnteriorList.pop(0)
+		
+		posicion=-1
+		if(miembros!=0):
+			for i in range(len(top5AnteriorList)):
+				if(cont_total>top5AnteriorList[i][1]):
+					posicion=i
+					break
 
-	#top 5 anterior
-	maximo=0
+		else:
+			top5AnteriorList.append([usuario,cont_total])
+		top5AnteriorList.insert(posicion,[usuario,cont_total])			
+		miembros+=1
+		if(miembros>4):
+			top5AnteriorList.pop(-1)
+		
+
+	#rendimiento anterior
 	for usuario in top5List:
 		cont_total=0
 		for proceso in procesos:
-			if(proceso.user_id==usuario[0].id):
+			if((proceso.user_id==usuario[0].id) and (proceso.id_categoria==categoria_elegida.id)):
 				for paso in pasos:
 					if(paso.id_proceso==proceso.id):
 						if(paso.estado and (paso.fecha_fin>=periodoAnteriorInicio.date()) and (paso.fecha_fin<=periodoAnteriorFinal.date())):
 							cont_total+=1
-		if(cont_total>maximo):
-			usuario.append(cont_total)
-	
-	print(top5List)
-	print(top5AnteriorList)
-	return "Revisa el cmd"
+		usuario.append(cont_total)
+	fechas=[fecha_inicio,fecha_fin,periodoAnteriorInicio,periodoAnteriorFinal]
+	top5Total=[top5List,top5AnteriorList,fechas]
 
-""" 	for usuario in usuarios:
-		cont_total=0
-		for proceso in procesos:
-			if(proceso.user_id==usuario.id):
-				for paso in pasos:
-					if(paso.id_proceso==proceso.id):
-						if(paso.estado and (paso.fecha_fin>=fecha_inicio.date()) and (paso.fecha_fin<=fecha_fin.date())):
-							cont_total+=1
-		if(cont_total>maximo):
-			top5List.append([usuario,cont_total])
-			miembros+=1
-		if(miembros>5):
-			top5List.pop(0) """
-			
+	#return "CMD"
+	return render_template('top5.html', list=top5Total)
 
 
 
