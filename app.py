@@ -183,6 +183,7 @@ def consultas():
 	categorias=Categoria.query.all()
 	return render_template('consultar.html',list=categorias)
 
+
 @app.route("/mostrar-top5",methods=['POST'])
 @login_required
 def top5():
@@ -268,11 +269,73 @@ def top5():
 							cont_total+=1
 		usuario.append(cont_total)
 	fechas=[fecha_inicio,fecha_fin,periodoAnteriorInicio,periodoAnteriorFinal]
-	top5Total=[top5List,top5AnteriorList,fechas]
+	top5Total=[top5List,top5AnteriorList,fechas,categoria_elegida]
 
 	#return "CMD"
 	return render_template('top5.html', list=top5Total)
 
+
+@app.route("/Consultas2",methods=['GET','POST'])
+@login_required
+def consultas2():
+	return render_template('consultar2.html')
+
+@app.route("/mostrar2Empleados",methods=['POST'])
+@login_required
+def mostrar2Empleados():
+	fecha_inicio = request.form['fecha_inicio']
+	fecha_inicio = datetime.strptime(fecha_inicio, "%Y-%m-%d")
+	fecha_fin = request.form['fecha_fin']
+	fecha_fin = datetime.strptime(fecha_fin, "%Y-%m-%d")
+	empleado1 = request.form['empleado1']
+	empleado2 = request.form['empleado2']
+	
+	#--------------------------------------------------------------------------------------
+	usuarios = User.query.all()
+	procesos = Proceso.query.all()
+	pasos = Task.query.all()
+	#-------------------------------------------------------------------------------------
+	listaFinal=[]
+	for usuario in usuarios:
+		if(usuario.user_name==empleado1):
+			listaProcesos=[]
+			#listaUsuarios.append(usuario)
+			for proceso in procesos:
+				guardarProceso=False
+				if(proceso.user_id==usuario.id):
+					listaPasos=[]
+					for paso in pasos:
+						if(paso.id_proceso==proceso.id):
+							if(paso.estado and (paso.fecha_fin>=fecha_inicio.date()) and (paso.fecha_fin<=fecha_fin.date())):
+								listaPasos.append(paso)
+								guardarProceso=True
+					if(guardarProceso):
+						lista_temporal=[proceso,listaPasos]
+						listaProcesos.append(lista_temporal)
+			lista_temporal=[usuario,listaProcesos]
+			listaFinal.append(lista_temporal)
+
+		if(usuario.user_name==empleado2):
+			listaProcesos=[]
+			#listaUsuarios.append(usuario)
+			for proceso in procesos:
+				guardarProceso=False
+				if(proceso.user_id==usuario.id):
+					listaPasos=[]
+					for paso in pasos:
+						if(paso.id_proceso==proceso.id):
+							if(paso.estado and (paso.fecha_fin>=fecha_inicio.date()) and (paso.fecha_fin<=fecha_fin.date())):
+								listaPasos.append(paso)
+								guardarProceso=True
+					if(guardarProceso):
+						lista_temporal=[proceso,listaPasos]
+						listaProcesos.append(lista_temporal)
+			lista_temporal=[usuario,listaProcesos]
+			listaFinal.append(lista_temporal)
+	
+	print(listaFinal,len(listaFinal[0][1]),len(listaFinal[0][1][1][1]))
+	#return "CMD"
+	return render_template('mostrar2Empleados.html', list=listaFinal)
 
 
 if __name__ == "__main__":

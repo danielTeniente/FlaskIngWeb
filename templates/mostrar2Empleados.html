@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>TOP 5</title>
+	<!--Bootstrap-->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<!--Fonts-->
+	<link href="https://fonts.googleapis.com/css?family=Lobster&display=swap" rel="stylesheet"> 
+	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='main.css')}}">
+</head>
+<body class="container p-4">
+	<h1 class="display-4 text-center title mt-4">TOP 5 {{list[3]}}</h1>
+	<div class="row">
+		<div class="col">
+			<div class="card">
+				<div class="card-body">
+					<h2>{{list[0][0]}}</h2>
+					<ul class="list-group">
+						{% for i in range(list[0][1]|length) %}
+							<h2>{{list[0][1][i][0]}}</h2>
+							{% for j in range(list[0][1][i][1]|length) %}
+								<li class="list-group-item">
+									<span>Paso: {{list[0][1][i][1][j]}}</span>	
+									<br>			
+								</li>
+							{% endfor %}
+							
+						{% endfor %}
+					</ul>
+				</div>							
+			</div>
+			<div class="col">
+				<div class="card">
+					<div class="card-body">
+						<h2>{{list[1][0]}}</h2>
+						<ul class="list-group">
+							{% for i in range(list[1][1]|length) %}
+								<h2>{{list[1][1][i][0]}}</h2>
+								{% for j in range(list[1][1][i][1]|length) %}
+									<li class="list-group-item">
+										<span>Paso: {{list[1][1][i][1][j]}}</span>	
+										<br>			
+									</li>
+								{% endfor %}
+								
+							{% endfor %}
+						</ul>
+					</div>							
+				</div>			
+		</div>
+	</div>
+	<a href="/logout">Logout</a>
+</body>
+</html>

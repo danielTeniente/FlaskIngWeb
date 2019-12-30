@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Consulta</title>
+	<title>Consulta 2</title>
 	<!--Bootstrap-->
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 	<!--Fonts-->
@@ -9,17 +9,18 @@
 	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='main.css')}}">
 </head>
 <body class="container p-4">
-	<h1 class="display-4 text-center title mt-4">Consulta</h1>
+	<h1 class="display-4 text-center title mt-4">Consulta 2</h1>
 	<div class="row">
 		<div class="col-md-4 offset-md-4 my-auto">
 			<div class="card">
 				<div class="card-header">
-					<form action="/mostrar-top5" method="POST">
+					<form action="/mostrar2Empleados" method="POST">
 						<div class="form-group">
 							<input type="date" value="" name="fecha_inicio" class="form-control">			
 							<input type="date" value="" name="fecha_fin" class="form-control">			
-							<span>Ingrese la Categoría</span>
-							<input type="text" value="" name="categoria_elegida" class="form-control">			
+							<span>Ingrese los empleados</span>
+							<input type="text" value="" name="empleado1" class="form-control">			
+							<input type="text" value="" name="empleado2" class="form-control">			
 						</div>
 						<button type="submit" class="btn btn-primary btn-block">Ver Top 5</button>
 					</form>					
